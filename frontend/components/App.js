@@ -22,20 +22,36 @@ export default function App() {
   const redirectToArticles = () => { /* ✨ implement */ }
 
   const logout = () => {
-    // ✨ implement
-    // If a token is in local storage it should be removed,
-    // and a message saying "Goodbye!" should be set in its proper state.
-    // In any case, we should redirect the browser back to the login screen,
-    // using the helper above.
+    // If a token is in local storage it should be removed:
+    window.localStorage.removeItem('token')
+    // A message saying "Goodbye!" should be set in its proper state:
+    setMessage("Goodbye!")
+    // In any case, redirect back to the login screen, using helper above:
+    redirectToLogin()
   }
 
   const login = ({ username, password }) => {
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
-    // and launch a request to the proper endpoint.
-    // On success, we should set the token to local storage in a 'token' key,
-    // put the server success message in its proper state, and redirect
-    // to the Articles screen. Don't forget to turn off the spinner!
+    // Flush the message state:
+    setMessage('') 
+    //Turn on the spinner:
+    setSpinnerOn(true)
+    // Request to send credentials to API to get back token:
+    axios.post(loginUrl, {username, password})
+      .then(response => {
+        // Set the token to local storage in a 'token' key:
+        window.localStorage.setItem('token', response.data.token)
+        //Put the server success message in its proper state:
+        setMessage(response.data.message)
+        //Redirect to the Articles screen:
+        redirectToArticles()
+        //Turn off the spinner:
+      })
+      .catch(error => {
+        setMessage(error.response.data.message)
+      })
+      .finally(() => {
+        setSpinnerOn(false)
+      })
   }
 
   const getArticles = () => {
